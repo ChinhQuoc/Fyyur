@@ -1,14 +1,20 @@
 from datetime import datetime
-from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL
+from flask_wtf import FlaskForm
+from wtforms import Form, IntegerField, StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, ValidationError, SubmitField
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp
+from urllib.parse import urlparse
+from models import *
 
-class ShowForm(Form):
-    artist_id = StringField(
-        'artist_id'
+VALID_GENRES = ['Alternative', 'Blues', 'Classical', 'Country', 'Electronic', 'Folk', 'Funk', 'Hip-Hop', 'Heavy Metal', 'Instrumental', 'Jazz',  'Musical Theatre', 'Pop', 'Punk',  'R&B',  'Reggae',  'Rock n Roll',  'Soul', 'Other']
+
+class ShowForm(FlaskForm):
+    artist_id = IntegerField(
+        'artist_id',
+        validators=[DataRequired()],
     )
-    venue_id = StringField(
-        'venue_id'
+    venue_id = IntegerField(
+        'venue_id',
+        validators=[DataRequired()],
     )
     start_time = DateTimeField(
         'start_time',
@@ -16,7 +22,17 @@ class ShowForm(Form):
         default= datetime.today()
     )
 
-class VenueForm(Form):
+    def validate_artist_id(seft, artist_id):
+        artist_object = artist.query.get(artist_id.data)
+        if artist_object is None:
+            raise ValidationError("ID can be found on the Artist's Page")
+        
+    def validate_venue_id(seft, venue_id):
+        venue_object = venue.query.get(venue_id.data)
+        if venue_object is None:
+            raise ValidationError("ID can be found on the Venue's Page")
+
+class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -83,7 +99,7 @@ class VenueForm(Form):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone', validators=[Regexp(regex='^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$', message="This phone is invalid!")]
     )
     image_link = StringField(
         'image_link'
@@ -126,9 +142,17 @@ class VenueForm(Form):
         'seeking_description'
     )
 
+    def validate_genres(seft, genres):
+        for genre in genres.data:
+            if genre not in VALID_GENRES:
+                raise ValidationError(f'{genre} is not a valid genre.')
+        
+    def validate_facebook_link(seft, facebook_link):
+        url = urlparse(facebook_link.data)
+        if not url.netloc.endswith("facebook.com"):
+            raise ValidationError("The URL must be a valid Facebook URL.")
 
-
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -193,7 +217,7 @@ class ArtistForm(Form):
     )
     phone = StringField(
         # TODO implement validation logic for phone 
-        'phone'
+        'phone', validators=[Regexp(regex='^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$', message="This phone is invalid!")]
     )
     image_link = StringField(
         'image_link'
@@ -237,3 +261,12 @@ class ArtistForm(Form):
             'seeking_description'
      )
 
+    def validate_genres(seft, genres):
+        for genre in genres.data:
+            if genre not in VALID_GENRES:
+                raise ValidationError(f'{genre} is not a valid genre.')
+        
+    def validate_facebook_link(seft, facebook_link):
+        url = urlparse(facebook_link.data)
+        if not url.netloc.endswith("facebook.com"):
+            raise ValidationError("The URL must be a valid Facebook URL.")

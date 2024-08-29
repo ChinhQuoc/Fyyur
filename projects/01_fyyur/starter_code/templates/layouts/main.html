@@ -58,6 +58,7 @@
                 (request.endpoint == 'show_venue') %}
               <form class="search" method="post" action="/venues/search">
                 <input class="form-control"
+                  id="search-venue"
                   type="search"
                   name="search_term"
                   placeholder="Find a venue"
@@ -69,6 +70,7 @@
                 (request.endpoint == 'show_artist') %}
               <form class="search" method="post" action="/artists/search">
                 <input class="form-control"
+                id="search-artist"
                   type="search"
                   name="search_term"
                   placeholder="Find an artist"
@@ -118,5 +120,25 @@
   <script type="text/javascript" src="/static/js/libs/bootstrap-3.1.1.min.js" defer></script>
   <script type="text/javascript" src="/static/js/plugins.js" defer></script>
 
+  <script>
+    const idSearchVenue = document.getElementById('search-venue');
+    const idSearchArtist = document.getElementById('search-artist');
+
+    idSearchVenue && idSearchVenue.addEventListener("keypress", function(event) {
+      if ((event.key) === 'Enter') {
+        fetch("/venues/search", {
+          method: 'POST'
+        })
+      }
+    });
+
+    idSearchArtist && idSearchArtist.addEventListener("keypress", function(event) {
+      if ((event.key) === 'Enter') {
+        fetch("/artists/search", {
+          method: 'POST'
+        })
+      }
+    });
+  </script>
 </body>
 </html>

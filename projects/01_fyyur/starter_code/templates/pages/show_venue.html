@@ -91,8 +91,26 @@ block content %}
   </div>
 </section>
 
-<a href="/venues/{{ venue.id }}/edit"
-  ><button class="btn btn-primary btn-lg">Edit</button></a
->
+<div>
+  <a href="/venues/{{ venue.id }}/edit"
+    ><button class="btn btn-primary btn-lg">Edit</button></a
+  >
+  <button
+    id="btn-delete"
+    class="btn btn-primary btn-lg"
+    venue_id="{{venue.id}}"
+  >
+    Delete
+  </button>
+</div>
 
+<script>
+  const elementBtnDelete = document.getElementById("btn-delete");
+  let id = elementBtnDelete.getAttribute("venue_id");
+  elementBtnDelete.addEventListener("click", function () {
+    fetch(`/venues/${+id}`, {
+      method: "DELETE",
+    });
+  });
+</script>
 {% endblock %}
