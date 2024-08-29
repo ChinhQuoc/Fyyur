@@ -17,6 +17,7 @@ from sqlalchemy import case, select, func, update, delete
 from datetime import datetime
 from werkzeug.datastructures import MultiDict
 from models import db
+from flask_migrate import Migrate
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -28,6 +29,8 @@ app.config.from_object('config')
 # TODO: connect to a local postgresql database
 app.config['SQLALCHEMY_DATABASE_URI']=SQLALCHEMY_DATABASE_URI
 db.init_app(app)
+
+migrate = Migrate(app, db)
 
 with app.app_context():
    db.create_all()
